@@ -17,9 +17,15 @@ class Tank:
         pass
 
     def check_coordinates(self):
-        pass
-        # проверять, что танк вышел за пределы
-        # если он вышел, сместить координаты на speed обратно
+        """Ограничивает поле, где могут ездить танки"""
+        if self.tank_y <= 0:
+            self.tank_y += self.speed
+        if self.tank_x <= 0:
+            self.tank_x += self.speed
+        if self.tank_x >= 788:
+            self.tank_x -= self.speed
+        if self.tank_y >= 590:
+            self.tank_y -= self.speed
 
 
 class Buldog(Tank):  # класс нашего танка (характеристики)
@@ -56,6 +62,7 @@ def game(play, tank, own_tank):
                 play = False
         draw.rect(screen, "white", Rect(0, 0, 800, 600))
         own_tank.move()
+        own_tank.check_coordinates()
         tank.draw_tank()
         own_tank.draw_tank()
         display.update()
