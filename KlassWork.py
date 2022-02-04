@@ -14,8 +14,11 @@ class Tank:
         self.speed = speed  # Скорость
         self.tank_x = tank_x  # КООРДИНАТЫ ПО ИКСУ
         self.tank_y = tank_y  # КООРДИНАТЫ ПО ИГРИКУ
-        self.width = width
-        self.height = height
+        self.width = width  # ширина
+        self.height = height  # высота
+
+    def draw_tank(self):
+        draw.rect(screen, self.skin, Rect(self.tank_x, self.tank_y, self.width, self.height))
 
     def move(self):  # меняем координаты для танка (двигаем танк)
         pass
@@ -33,9 +36,6 @@ class Tank:
 
 
 class Buldog(Tank):  # класс нашего танка (характеристики)
-    def draw_tank(self):
-        draw.rect(screen, self.skin, Rect(self.tank_x, self.tank_y, 12, 10))
-
     def move(self):
         if key.get_pressed()[key.key_code("w")]:
             self.tank_y -= self.speed
@@ -48,8 +48,7 @@ class Buldog(Tank):  # класс нашего танка (характерис�
 
 
 class Enemy(Tank):  # вражеский танк
-    def draw_tank(self):
-        draw.rect(screen, self.skin, Rect(self.tank_x, self.tank_y, 12, 10))
+    pass
 
 
 class Bullet:
@@ -65,21 +64,21 @@ screen = display.set_mode([800, 600])
 
 def check_tanks_coordinates(buldog: Buldog, enemy: Enemy) -> None:
     """не разрешает танкам заезжать друг на друга"""
-    if (buldog.tank_y + 10 > enemy.tank_y) and (buldog.tank_y < enemy.tank_y + 10) \
-            and (buldog.tank_x + 12 >= enemy.tank_x) and (buldog.tank_x <= enemy.tank_x):  # слева направо
+    if (buldog.tank_y + buldog.height > enemy.tank_y) and (buldog.tank_y < enemy.tank_y + enemy.height) \
+            and (buldog.tank_x + buldog.width >= enemy.tank_x) and (buldog.tank_x <= enemy.tank_x):  # слева направо
         buldog.tank_x -= buldog.speed
-    if (buldog.tank_y + 10 > enemy.tank_y) and (buldog.tank_y < enemy.tank_y + 10) \
-            and (buldog.tank_x - 12 <= enemy.tank_x) and (buldog.tank_x >= enemy.tank_x):  # справа налево
+    if (buldog.tank_y + buldog.height > enemy.tank_y) and (buldog.tank_y < enemy.tank_y + enemy.height) \
+            and (buldog.tank_x <= enemy.tank_x + enemy.width) and (buldog.tank_x >= enemy.tank_x):  # справа налево
         buldog.tank_x += buldog.speed
 
-    # левая точка нашего танка левее правой точки чужого танка,
-    # правая точка нашего танка правее левой точки чужого танка
-    if (buldog.tank_y + 11 > enemy.tank_y) and (buldog.tank_y < enemy.tank_y + 10) \
-            and (buldog.tank_x + 12 > enemy.tank_x) and (buldog.tank_x < enemy.tank_x + 12):  # сверху вниз
+    if (buldog.tank_y + buldog.height + 1 > enemy.tank_y) and (buldog.tank_y < enemy.tank_y + enemy.height) \
+            and (buldog.tank_x + buldog.width > enemy.tank_x) and (buldog.tank_x < enemy.tank_x + enemy.width):
+        # сверху вниз
         buldog.tank_y -= buldog.speed
 
-    if (buldog.tank_y - 11 < enemy.tank_y) and (buldog.tank_y > enemy.tank_y) \
-            and (buldog.tank_x + 12 > enemy.tank_x) and (buldog.tank_x < enemy.tank_x + 12):  # сверху вниз
+    if (buldog.tank_y < enemy.tank_y + enemy.height + 1) and (buldog.tank_y > enemy.tank_y) \
+            and (buldog.tank_x + buldog.width > enemy.tank_x) and (buldog.tank_x < enemy.tank_x + enemy.width):
+        # снизу вверх
         buldog.tank_y += buldog.speed
 
 
