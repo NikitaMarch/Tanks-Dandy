@@ -3,15 +3,19 @@ from pygame import *
 
 class Tank:
     """Наивысший класс, создаёт переменные для любого танка"""
-    def __init__(self, noise: str, tank_x: int, tank_y, skin, speed, armor=100, health_point=100, bullets=60):
+
+    def __init__(self, noise: str, tank_x: int, tank_y, skin, speed, armor=100, health_point=100, bullets=60, width=12,
+                 height=10):
         self.noise = noise  # выводит слово сохраненное в нем
-        self.skin = skin  # скин (надо изменить)
+        self.skin = skin  # цвет танка
         self.armor = armor  # броня
-        self.health_point = health_point #ХП
-        self.bullets = bullets#ПАТРОНЫ
-        self.speed = speed#Скорость
-        self.tank_x = tank_x#КООРДИНАТЫ ПО ИКСУ
-        self.tank_y = tank_y#КООРДИНАТЫ ПО ИГРИКУ
+        self.health_point = health_point  # ХП
+        self.bullets = bullets  # ПАТРОНЫ
+        self.speed = speed  # Скорость
+        self.tank_x = tank_x  # КООРДИНАТЫ ПО ИКСУ
+        self.tank_y = tank_y  # КООРДИНАТЫ ПО ИГРИКУ
+        self.width = width
+        self.height = height
 
     def move(self):  # меняем координаты для танка (двигаем танк)
         pass
@@ -22,9 +26,9 @@ class Tank:
             self.tank_y += self.speed
         if self.tank_x <= 0:
             self.tank_x += self.speed
-        if self.tank_x >= 788:
+        if self.tank_x >= 800 - self.width:
             self.tank_x -= self.speed
-        if self.tank_y >= 590:
+        if self.tank_y >= 600 - self.height:
             self.tank_y -= self.speed
 
 
@@ -43,17 +47,43 @@ class Buldog(Tank):  # класс нашего танка (характерис�
             self.tank_x += self.speed
 
 
-class Enemy(Tank):# вражеский танк
+class Enemy(Tank):  # вражеский танк
     def draw_tank(self):
         draw.rect(screen, self.skin, Rect(self.tank_x, self.tank_y, 12, 10))
 
-# надо дописать комментарии
+
+class Bullet:
+    def __init__(self):
+        pass
+
+    def draw_bullet(self):
+        pass
 
 
 screen = display.set_mode([800, 600])
 
 
-def game(play, tank, own_tank):
+def check_tanks_coordinates(buldog: Buldog, enemy: Enemy) -> None:
+    """не разрешает танкам заезжать друг на друга"""
+    if (buldog.tank_y + 10 > enemy.tank_y) and (buldog.tank_y < enemy.tank_y + 10) \
+            and (buldog.tank_x + 12 >= enemy.tank_x) and (buldog.tank_x <= enemy.tank_x):  # слева направо
+        buldog.tank_x -= buldog.speed
+    if (buldog.tank_y + 10 > enemy.tank_y) and (buldog.tank_y < enemy.tank_y + 10) \
+            and (buldog.tank_x - 12 <= enemy.tank_x) and (buldog.tank_x >= enemy.tank_x):  # справа налево
+        buldog.tank_x += buldog.speed
+
+    # левая точка нашего танка левее правой точки чужого танка,
+    # правая точка нашего танка правее левой точки чужого танка
+    if (buldog.tank_y + 11 > enemy.tank_y) and (buldog.tank_y < enemy.tank_y + 10) \
+            and (buldog.tank_x + 12 > enemy.tank_x) and (buldog.tank_x < enemy.tank_x + 12):  # сверху вниз
+        buldog.tank_y -= buldog.speed
+
+    if (buldog.tank_y - 11 < enemy.tank_y) and (buldog.tank_y > enemy.tank_y) \
+            and (buldog.tank_x + 12 > enemy.tank_x) and (buldog.tank_x < enemy.tank_x + 12):  # сверху вниз
+        buldog.tank_y += buldog.speed
+
+
+def game(play, tanks, own_tank):
     """Следит, что происходит в игре"""
 
     while play:  # бесконечный цикл, который перезапускает проверку игры
@@ -61,19 +91,24 @@ def game(play, tank, own_tank):
             if e.type == QUIT:
                 play = False
         draw.rect(screen, "white", Rect(0, 0, 800, 600))
-        own_tank.move()
         own_tank.check_coordinates()
-        tank.draw_tank()
+
+        for tank in tanks:
+            check_tanks_coordinates(own_tank, tank)
+            tank.draw_tank()
+
+        own_tank.move()
         own_tank.draw_tank()
         display.update()
 
 
-def start(): #игра запускается
+def start():  # игра запускается
     init()
     play = True
+    enemies = [Enemy('wrrrwrrrwrrw', 377, 300, 'gray', 23), Enemy('wrrrwrrrwrrw', 377, 400, 'gray', 23),
+               Enemy('wrrrwrrrwrrw', 377, 444, 'gray', 23)]
     own_tank = Buldog("efdssvbfdb", 280, 172, 'brown', 0.1)  # можно изменить цвет через rgb код (гуглить)
-    on_tank = Enemy('wrrrwrrrwrrw', 377, 300, 'gray', 23)  # можно изменить цвет через rgb код (гуглить)
-    game(play, on_tank, own_tank)
+    game(play, enemies, own_tank)
 
 
 start()
