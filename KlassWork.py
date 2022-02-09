@@ -5,7 +5,7 @@ class Tank:
     """Наивысший класс, создаёт переменные для любого танка"""
 
     def __init__(self, noise: str, tank_x: int, tank_y, skin, speed, armor=100, health_point=100, bullets=60, width=12,
-                 height=10):
+                 height=10, target=""):
         self.noise = noise  # выводит слово сохраненное в нем
         self.skin = skin  # цвет танка
         self.armor = armor  # броня
@@ -16,6 +16,7 @@ class Tank:
         self.tank_y = tank_y  # КООРДИНАТЫ ПО ИГРИКУ
         self.width = width  # ширина
         self.height = height  # высота
+        self.target = target
 
     def draw_tank(self):
         draw.rect(screen, self.skin, Rect(self.tank_x, self.tank_y, self.width, self.height))
@@ -35,10 +36,12 @@ class Tank:
             self.tank_y -= self.speed
 
 
-class Buldog(Tank):  # класс нашего танка (характеристики)
+class Buldog(Tank):
+    """Наш танк"""
     def move(self):
         if key.get_pressed()[key.key_code("w")]:
             self.tank_y -= self.speed
+            self.target = 'u'
         if key.get_pressed()[key.key_code("s")]:
             self.tank_y += self.speed
         if key.get_pressed()[key.key_code("a")]:
@@ -52,10 +55,26 @@ class Enemy(Tank):  # вражеский танк
 
 
 class Bullet:
-    def __init__(self):
-        pass
+    """старший класс пули, общие настройки"""
+    def __init__(self, damage: int, speed: int, width: int, height: int):
+        self.damage = damage
+        self.speed = speed
+        self.width = width
+        self.height = height
 
     def draw_bullet(self):
+        draw.rect(screen, self.width, self.height)  # Rect(1, 1, 2, 2) - пример
+
+    def move(self):
+        """Пуля двигается (летит)"""
+        # 1) сохранять направление для танка
+        # 2) проверять направление танка (конкретно пушки)
+        # 3) передать последнее направление танка (в момент выстрела) для пули
+        # 4) меняем координаты пули (двигаем) согласно этому направляю
+        # 5) если пуля вышла за пределы или пуля попала в чужой танк - пуля уничтожается
+        pass
+
+    def make_damage(self):
         pass
 
 
